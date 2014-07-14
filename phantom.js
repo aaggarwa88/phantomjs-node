@@ -11,6 +11,8 @@
 
   spawn = require('win-spawn');
 
+  var ps;
+
   phanta = [];
 
   startPhantomProcess = function(binary, port, args) {
@@ -90,7 +92,7 @@
       httpServer = http.createServer();
       httpServer.listen(options.port);
       httpServer.on('listening', function() {
-        var port, ps;
+        var port;
         port = httpServer.address().port;
         ps = startPhantomProcess(options.binary, port, args);
         ps.stdout.on('data', options.onStdout || function(data) {
@@ -138,6 +140,7 @@
         d = dnode({}, options.dnodeOpts);
         d.on('remote', function(phantom) {
           wrap(phantom);
+          phantom.ps = ps;
           phanta.push(phantom);
           return typeof cb === "function" ? cb(phantom) : void 0;
         });
