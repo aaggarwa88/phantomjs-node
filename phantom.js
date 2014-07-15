@@ -12,6 +12,7 @@
   spawn = require('win-spawn');
 
   var ps;
+  var sockets = [];
 
   phanta = [];
 
@@ -91,6 +92,16 @@
       phantom = null;
       httpServer = http.createServer();
       httpServer.listen(options.port);
+
+      httpServer.on('connection', function (socket) {
+        sockets.push(socket);
+        socket.on('close', function () {
+          console.log('socket closed');
+          sockets.splice(sockets.indexOf(socket), 1);
+        });
+      });
+      
+
       httpServer.on('listening', function() {
         var port;
         port = httpServer.address().port;
@@ -111,6 +122,12 @@
         return ps.on('exit', function(code, signal) {
           var p;
           httpServer.close();
+
+          for (var i = 0; i < sockets.length; i++) {
+            console.log('socket #' + i + ' destroyed');
+            sockets[i].destroy();
+          }
+          
           if (phantom) {
             if (typeof phantom.onExit === "function") {
               phantom.onExit();
