@@ -11,6 +11,8 @@
 
   spawn = require('win-spawn');
 
+  var log = require('../../../../routes/log');
+
   var ps;
 
   phanta = [];
@@ -24,6 +26,9 @@
     for (_i = 0, _len = phanta.length; _i < _len; _i++) {
       phantom = phanta[_i];
       phantom.exit();
+    }
+    if(cluster.isMaster) {
+      log.write({state: 'server_down_signal', status: 1});
     }
     return process.exit();
   };
