@@ -11,6 +11,8 @@
 
   spawn = require('win-spawn');
 
+  cluster = require('cluster');
+
   var log = require('../../../../routes/log');
 
   var ps;
